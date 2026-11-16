@@ -1,0 +1,69 @@
+{
+  "experiment_id": "c0_seed42_20261109",
+  "model_structure": {
+    "architecture": "torchvision.models.resnet18",
+    "pretrained_weights": "ResNet18_Weights.IMAGENET1K_V1",
+    "classifier": "Linear(512, 6)",
+    "total_parameters": 11179590,
+    "trainable_parameters": 3078,
+    "frozen_parameters": 11176512,
+    "batchnorm_layers_kept_in_eval": 20
+  },
+  "class_map": {
+    "Cr": 0,
+    "In": 1,
+    "Pa": 2,
+    "PS": 3,
+    "RS": 4,
+    "Sc": 5
+  },
+  "preprocessing": {
+    "image_size": 224,
+    "channels": 3,
+    "resnet18_weights": "IMAGENET1K_V1",
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ],
+    "train_horizontal_flip_probability": 0.5,
+    "val_test_random_augmentation": false
+  },
+  "seed": 42,
+  "split_sha256": {
+    "train": "3777a7c64cadf831ee87b9511ac5b4a42bd3ca2987467e351a9abee6385403cb",
+    "val": "7ecb174f0938dbb045b936b0d99aef72e39009294e8ee83ae3b3000e543a667f",
+    "test": "9b59e03359ba04b1f39ed1efaa150acce43256aa09b733fe6b1982633dfa1dd1"
+  },
+  "training_config": {
+    "experiment_id": "c0_seed42_20261109",
+    "seed": 42,
+    "batch_size": 32,
+    "epochs": 15,
+    "learning_rate": 0.001,
+    "optimizer": "Adam",
+    "loss": "CrossEntropyLoss",
+    "early_stopping_patience": 5,
+    "model_selection": "val_macro_f1",
+    "device": "cuda",
+    "num_workers": 0,
+    "pretrained_weights": "IMAGENET1K_V1"
+  },
+  "dependency_versions": {
+    "torch": "2.12.0+cu130",
+    "torchvision": "0.27.0+cu130",
+    "numpy": "2.4.6",
+    "scikit-learn": "1.9.1",
+    "Pillow": "13.0.0",
+    "PyYAML": "6.0.3"
+  },
+  "python_version": "3.11.9",
+  "torch_cuda_runtime": "13.0",
+  "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "started_at_Asia_Shanghai": "2026-11-09T16:27:43.735789+08:00"
+}

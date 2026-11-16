@@ -1,0 +1,45 @@
+{
+  "generated_at_Asia_Shanghai": "2026-11-09T15:20:56.639904+08:00",
+  "dataset": "NEU-CLS",
+  "images_root": "raw/NEU-CLS",
+  "total_image_candidates": 1800,
+  "valid_images": 1800,
+  "invalid_images": 0,
+  "ignored_non_image_files": [
+    "raw/NEU-CLS/Thumbs.db"
+  ],
+  "class_counts": {
+    "Cr": 300,
+    "In": 300,
+    "Pa": 300,
+    "PS": 300,
+    "RS": 300,
+    "Sc": 300
+  },
+  "dimensions": {
+    "200x200": 1800
+  },
+  "formats": {
+    "BMP": 1800
+  },
+  "modes": {
+    "L": 1800
+  },
+  "channel_counts": {
+    "1": 1800
+  },
+  "exact_duplicate_groups": 1,
+  "exact_duplicate_images": 2,
+  "near_duplicate_pairs": 4418,
+  "near_duplicate_cross_class_pairs": 2904,
+  "near_duplicate_distance_counts": {
+    "0": 362,
+    "1": 540,
+    "2": 965,
+    "3": 1151,
+    "4": 1400
+  },
+  "high_priority_near_duplicate_pairs": 2,
+  "near_duplicate_max_hamming_distance": 4,
+  "near_duplicates_require_review": true
+}

@@ -1,0 +1,203 @@
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}
+
+\IEEEoverridecommandlockouts
+\overrideIEEEmargins
+\usepackage{ctex}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{url}
+\graphicspath{{figures/}}
+
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead[CO,RE]{机器学习高级技术及应用}
+\fancyhead[LO,CE]{作者: 陈家浩等}
+\fancyhead[RO,LE]{\today}
+\fancyfoot[CO,RE]{机器学习高级技术及应用}
+\fancyfoot[LO,CE]{代课教师 李乡儒, 华南师范大学}
+\fancyfoot[RO,LE]{\thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\setlength{\voffset}{-10mm}
+\setlength{\topmargin}{0mm}
+\setlength{\headheight}{5mm}
+\setlength{\headsep}{5mm}
+\setlength{\footskip}{8mm}
+
+\title{\LARGE \bf
+基于 CNN 与迁移学习的钢材表面缺陷分类识别与辅助分析系统
+}
+\author{陈家浩~(学号 202421315022) \\
+组员二: \underline{\hspace{1.8cm}}~(学号待填写) \quad
+组员三: \underline{\hspace{1.8cm}}~(学号待填写) \\
+2026 年 11 月 9 日}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+本文研究六种已知钢材表面缺陷的图像分类, 并报告课程项目第一阶段的数据工程与初步模型实验. 使用东北大学 NEU-CLS 分类图像集, 核查得到 1800 张可读取的 $200\times200$ 单通道 BMP 图像, 六类各 300 张. 经完全重复与近重复筛查, 人工复核后, 固定随机种子 42, 按类别划分训练, 验证, 测试集为 1260, 270, 270 张, 已确认重复图像均未跨集合. 模型采用 ImageNet 预训练 ResNet18, 冻结主干及 BatchNorm 运行统计量, 仅训练六分类全连接层. 真实批次 Smoke Test 与 6 项 pytest 均通过. C0 首轮训练在第 8 轮获得最佳验证 Accuracy 0.992593, Macro-F1 0.992592, 第 13 轮提前停止; 训练循环耗时 73.454 s. 这些数字只描述固定划分上的初步验证结果, 尚不能代替独立测试或工业环境评价.
+
+\vspace{1ex}\noindent\textbf{关键词}: 钢材表面缺陷分类; 卷积神经网络; 迁移学习; ResNet18; 图像分类
+\end{abstract}
+
+\begin{eabstract}
+This paper reports the first stage of a course project on classifying six known steel surface defects. We audited the image-only NEU-CLS dataset and verified 1,800 readable grayscale BMP images of size $200\times200$, with 300 images per class. Exact and candidate near-duplicates were checked before a fixed, class-stratified split of 1,260 training, 270 validation, and 270 test images. Manually confirmed duplicate pairs do not cross splits. Our C0 model uses an ImageNet-pretrained ResNet18 as a frozen feature extractor, keeps BatchNorm running statistics fixed, and trains only a six-class linear head. A real-batch smoke test and six pytest cases passed. The best validation accuracy and macro-F1 were 0.992593 and 0.992592 at epoch 8; early stopping occurred at epoch 13 after 73.454 s of training-loop time. These are preliminary validation results; no independent test-set or industrial deployment claim is made.
+
+\vspace{1ex}\noindent\textbf{Keywords}: steel surface defect classification; convolutional neural network; transfer learning; ResNet18; image classification
+\end{eabstract}
+
+\section{引言}
+钢材表面缺陷的人工观察与分类涉及重复性工作, 同时受到缺陷形态和成像条件差异的影响. 东北大学公开的 NEU 表面缺陷数据库包含六种典型热轧钢材表面缺陷, 并指出类内外观差异与类间相似性等挑战\cite{neu-database}. 卷积神经网络可从图像中学习判别特征; 残差网络通过残差连接支持较深网络的训练\cite{resnet}. 本项目以此为基础, 探索可复现的六分类流程, 不将课程实验结果直接推广为工业质检能力.
+
+本项目的输入默认属于 Cr, In, Pa, PS, RS, Sc 六种\emph{已知缺陷}之一. 输出是其中一个类别; 当前阶段聚焦数据与模型验证. 本任务不是正常/异常检测, 也不做目标检测, 缺陷定位, 分割或工业实时部署. 即使后续展示 Softmax 概率, 其数值也不等于经过校准的真实正确率或质量合格概率.
+
+需求基线提出两个研究问题. RQ1: ImageNet 预训练 ResNet18 能否对固定划分的 NEU-CLS 六类图像进行分类, 各类表现如何? RQ2: 从冻结特征提取器的 C0 转向部分层微调的 C1 后, 验证性能与训练成本如何变化? 第一阶段仅对 RQ1 给出\emph{初步验证集证据}; 逐类及独立测试评价, RQ2 比较留待后续阶段.
+
+\section{数据集与数据工程}
+\subsection{来源, 类别与完整性}
+本项目从东北大学宋克臣教师主页列出的 NEU-CLS image-only 链接获取分类图像\cite{neu-database}; 没有使用 NEU-DET 或 NEU-CLS-64. 原始压缩包下载于 2026-11-09; SHA256 前缀为 \texttt{a85bcc6bfa1a40e7}, 完整校验值记录在项目的 \path{results/metrics/neu_cls_download.json}. 官方页面提供引用建议, 但未明确给出数据使用或再分发许可证, 因而原图仅用于当前本地实验, 对外再分发需进一步核实授权.
+
+质量检查脚本逐张读取 1800 张候选图像, 有效图像 1800 张, 损坏或不可读取图像 0 张. 全部图像为 $200\times200$ 像素, BMP 格式, 单通道灰度图. Cr, In, Pa, PS, RS, Sc 各 300 张; 标签固定为 Cr=0, In=1, Pa=2, PS=3, RS=4, Sc=5, 保存在统一类别映射 JSON 中. 图~\ref{fig:examples} 给出真实样例, 图~\ref{fig:distribution} 显示类别均衡情况.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.82\linewidth]{neu_cls_examples.png}
+  \caption{NEU-CLS 六类真实图像样例. 图像来自本项目数据核查输出.}
+  \label{fig:examples}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{neu_cls_class_distribution.png}
+  \caption{六类样本数量统计. 每类均为 300 张.}
+  \label{fig:distribution}
+\end{figure}
+
+\subsection{重复检查, 人工复核与划分}
+SHA256 检查发现 1 组, 2 张完全重复图像, 即 \texttt{Pa\_101.bmp} 与 \texttt{Pa\_105.bmp}. dHash 距离不超过 4 的初筛得到 4418 对\emph{疑似}近重复候选; 此数字并不代表 4418 对都已确认为重复. 其中两对高优先级候选经过人工复核, \texttt{In\_188.bmp}/\texttt{In\_210.bmp} 与 \texttt{PS\_171.bmp}/\texttt{PS\_292.bmp} 均判定为 duplicate. 其他候选尚未逐对人工确认, 原图没有删除或改标签.
+
+划分时使用 seed=42, 以 70\%/15\%/15\% 为目标按类分层. 为规避候选跨集合泄漏, 将完全重复及全部 dHash 初筛候选连接成组并整组分配, 共形成 1511 组, 最大组 207 张. 这是保守的防泄漏策略, 不意味着同组每张图都已被人工确认为重复. 表~\ref{tab:split} 给出实际数量; 三集合共 1800 个唯一图像路径, 路径交叉, 完全重复跨集合和已记录近重复候选跨集合均为 0. 完全重复的 Pa 图像同在 train; 人工确认的 In 图像同在 test, PS 图像同在 val. 测试集尚未用于模型选择或评价.
+
+\begin{table}[t]
+  \centering
+  \caption{固定划分的实际样本数}
+  \label{tab:split}
+  \begin{tabular}{lrrrr}
+    \toprule
+    类别 & Train & Val & Test & 合计 \\
+    \midrule
+    Cr & 210 & 45 & 45 & 300 \\
+    In & 210 & 45 & 45 & 300 \\
+    Pa & 210 & 45 & 45 & 300 \\
+    PS & 210 & 45 & 45 & 300 \\
+    RS & 210 & 45 & 45 & 300 \\
+    Sc & 210 & 45 & 45 & 300 \\
+    \midrule
+    合计 & 1260 & 270 & 270 & 1800 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{输入变换与数据加载}
+已有 PyTorch Dataset/DataLoader 按保存的 CSV 清单读取图像与标签. 原图转换为 RGB 三通道后缩放为 $224\times224$, 再按所用 ResNet18 预训练权重的均值 $[0.485,0.456,0.406]$ 和标准差 $[0.229,0.224,0.225]$ 归一化\cite{torchvision-resnet18}. 训练集仅随机水平翻转, 概率为 0.5; 验证和测试变换不含随机增强. 三套数据加载器均曾成功读取形状 $[32,3,224,224]$ 的批次. 图~\ref{fig:histogram} 展示原始灰度分布, 可辅助理解不同图像的亮度变化, 但不作为本轮调参依据.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{neu_cls_grayscale_histogram.png}
+  \caption{NEU-CLS 原始图像的灰度直方图, 由实际数据核查生成.}
+  \label{fig:histogram}
+\end{figure}
+
+\section{模型设计与实验方法}
+\subsection{固定特征提取器 C0}
+选择 ResNet18 是为了在本地 GPU 上先建立结构明确, 可复现的迁移学习基线. 残差网络的设计参见原始论文\cite{resnet}; torchvision 提供对应模型与 ImageNet 预训练权重\cite{torchvision-resnet18}. PyTorch 官方迁移学习教程亦给出冻结预训练特征提取器, 只训练新分类头的实践路径\cite{pytorch-transfer}. 这构成 C0 的方法依据, 但不预设其优于其他模型.
+
+C0 加载 ResNet18 的 \texttt{IMAGENET1K\_V1} 权重, 冻结原主干所有参数, 将最终层替换为 $\mathrm{Linear}(512,6)$. 总参数量为 11,179,590, 其中仅分类头的 $512\times6+6=3,078$ 个参数可训练. 训练模式下显式保持 20 个 BatchNorm 层为 eval 状态, 使主干的运行均值, 方差不被意外更新. 实际 Smoke Test 对冻结参数和 BatchNorm 缓冲区做了前后比较.
+
+\subsection{训练与选择策略}
+表~\ref{tab:config} 列出本轮实际配置. 使用交叉熵损失和 Adam 优化器; 每轮在训练集更新参数, 再于验证集计算 Loss, Accuracy 和 Macro-F1. 对 $N$ 个样本, $K=6$ 类, 所用指标可写为
+\begin{equation}
+  L_{\mathrm{CE}}=-\frac{1}{N}\sum_{i=1}^{N}\log p_{i,y_i},\quad
+  \mathrm{Acc}=\frac{\sum_i\mathbf{1}(\hat y_i=y_i)}{N},
+\end{equation}
+\begin{equation}
+  \mathrm{MacroF1}=\frac{1}{K}\sum_{c=1}^{K}\mathrm{F1}_{c}.
+\end{equation}
+其中 $p_{i,y_i}$ 为正确类别的模型输出概率. Macro-F1 对六类的 F1 等权平均, 用于最佳权重选择. 验证 Macro-F1 严格提高时保存权重; 连续 5 轮未提高则提前停止. 本轮配置与结果由实验编号 \texttt{c0\_seed42\_20261109} 关联, 权重包含类别映射, 预处理, 种子, 划分哈希, 配置和依赖版本.
+
+\begin{table}[t]
+  \centering
+  \caption{C0 首轮训练的实际配置}
+  \label{tab:config}
+  \begin{tabular}{ll}
+    \toprule
+    配置项 & 实际值 \\
+    \midrule
+    随机种子 / 设备 & 42 / CUDA \\
+    批量 / 最大轮数 & 32 / 15 \\
+    优化器 / 学习率 & Adam / 0.001 \\
+    损失函数 & CrossEntropyLoss \\
+    模型选择 & 验证 Macro-F1 \\
+    提前停止耐心值 & 5 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{第一阶段实验结果与分析}
+\subsection{真实批次 Smoke Test}
+在 RTX 4060 Laptop GPU 上加载 32 张真实训练图像, 前向输出为 $[32,6]$, 交叉熵为 1.951216. 反向传播后分类头梯度非零且优化步更新了分类头; 主干参数和 BatchNorm 运行统计量保持不变. 保存并重载权重后, 同一批次的最大 logit 差为 0.0. 全项目 pytest 为 6 项通过. 这些检查证明本轮训练链路可执行, 并不等同于泛化性能评价.
+
+\subsection{首轮训练曲线与最佳权重}
+图~\ref{fig:curves} 来自本轮训练历史 CSV. 训练 Loss 从第 1 轮的 1.086774 降至第 13 轮的 0.039484, 验证 Loss 从 0.561193 降至 0.045327. 训练 Accuracy 从 0.756349 升至 0.997619, 验证 Accuracy 从 0.985185 升至 0.992593. 验证 Macro-F1 在第 8 轮达到 0.9925921353, 随后虽有验证 Loss 继续下降, Macro-F1 未再严格提高. 因而按预先设置的选择指标保存第 8 轮权重, 并在第 13 轮因连续 5 轮无提升而停止.
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.96\textwidth]{c0_seed42_20261109_curves.png}
+  \caption{实验 c0\_seed42\_20261109 的训练/验证 Loss, Accuracy 及验证 Macro-F1 曲线. 所有点来自实际逐轮日志.}
+  \label{fig:curves}
+\end{figure*}
+
+\begin{table}[t]
+  \centering
+  \caption{C0 首轮训练与最佳验证结果}
+  \label{tab:results}
+  \begin{tabular}{lr}
+    \toprule
+    指标 & 实际值 \\
+    \midrule
+    实际轮数 / 最佳轮数 & 13 / 8 \\
+    最佳验证 Loss & 0.072322 \\
+    最佳验证 Accuracy & 0.992593 \\
+    最佳验证 Macro-F1 & 0.992592 \\
+    训练循环总耗时 & 73.454 s \\
+    最佳权重重载一致性 & 通过 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+表~\ref{tab:results} 的最佳验证 Accuracy 对应 270 张验证图像, 不是测试集 Accuracy. 训练循环耗时不包含启动, 下载和结束后的独立产物核验. 已保存的 270 条验证预测重新计算后与总结指标一致, 最佳权重可重新加载; 历史 CSV, 训练日志和曲线数据相互一致. 当前结果支持固定划分上的 C0 初步可行性, 但尚无独立测试, 逐类误差分析或跨数据域证据.
+
+\section{系统设计与后续开发方案}
+项目按数据处理, 模型训练, 模型评价, 图像预测与 Streamlit Web 展示划分模块. 第一阶段已实现数据核查, 固定清单, Dataset/DataLoader, C0 模型与训练记录; 模型评价目前仅包含训练与验证指标及保存的验证预测. 图像预测接口, Web 页面及完整独立评价尚未实现, 不能将其写为现有系统功能.
+
+第二阶段计划完善验证集的逐类指标与混淆矩阵, 封装共用的推理预处理与模型加载流程, 实现 Streamlit 单图上传和结果展示. 在 C0 链路稳定后, 计划以最佳权重为起点, 解冻 \texttt{layer4} 与 \texttt{fc} 进行 C1 微调, 比较同一划分上的性能和训练成本. C1 相对 C0 还包含额外训练预算, 后续分析不得将全部变化简单归因于解冻层. 待模型选择和评价协议确定后, 测试集只用于一次性独立评价. 有效图像, 不支持格式, 损坏图像及缺失权重的基本测试与运行文档也列为下一阶段工作.
+
+\section{讨论与阶段反思}
+NEU-CLS 每类只有 300 张, 且本轮仅在同源数据的固定划分上验证. 第 8 轮的较高 Accuracy 和 Macro-F1 可能与数据集规模, 类别分布及迁移学习特征有关, 但目前没有证据将其解释为工业生产线表现. 尽管已确认重复图像未跨集合, 4418 对 dHash 候选并未全部人工确认; 保守分组减少了已记录候选的跨集合风险, 也可能形成较大的关联组. 后续需要在不利用测试集调参的前提下进一步分析这一限制.
+
+固定特征提取器仅更新 3078 个参数, 有利于快速得到可运行基线; 同时它限制了主干对钢材纹理任务的适应能力. C1 将检验部分微调的效果, 但第一阶段不能预先声称会提升. 目前也没有独立测试指标, 逐类 Precision/Recall/F1, 真实错误案例或系统原型, 因此尚不能宣称 MVP 或最终项目已通过全部验收.
+
+实施过程中, torchvision 首次下载 ResNet18 权重出现哈希不匹配, 加载失败. 后续从其指定的同一官方地址分段续传, 完整 SHA256 校验通过后才开始 Smoke Test 与训练, 未以其他权重替代. Codex 辅助整理代码和实验记录; 高优先级近重复图像由人工复核, 模型结论依据实际日志, 保存预测和可重载权重. 团队成员分工与报告最终核对仍需三名组员亲自确认.
+
+\section{阶段结论与展望}
+第一阶段已形成可重复运行的 NEU-CLS 数据核查, 固定划分和预处理流程, 并完成 ResNet18 C0 的真实批次 Smoke Test, 首轮训练及产物一致性核验. 最佳模型在验证集上的 Accuracy 为 0.9925925732, Macro-F1 为 0.9925921353. 结论仅限于当前划分和验证协议. 后续将完成独立评价, C1 微调及对比, 预测接口与 Streamlit 原型, 再讨论项目整体效果与适用边界.
+
+\begin{thebibliography}{99}
+\bibitem{neu-database} K. Song and Y. Yan, "NEU surface defect database," Northeastern University, dataset page. [Online]. Available: \url{https://faculty.neu.edu.cn/songkechen/zh_CN/zhym/263269/}. Accessed: Nov. 9, 2026.
+\bibitem{resnet} K. He, X. Zhang, S. Ren, and J. Sun, "Deep Residual Learning for Image Recognition," arXiv:1512.03385, 2015. [Online]. Available: \url{https://arxiv.org/abs/1512.03385}.
+\bibitem{pytorch-transfer} PyTorch, "Transfer Learning for Computer Vision Tutorial." [Online]. Available: \url{https://docs.pytorch.org/tutorials/beginner/transfer_learning_tutorial.html}. Accessed: Nov. 9, 2026.
+\bibitem{torchvision-resnet18} Torchvision, "resnet18 model and ResNet18\_Weights documentation." [Online]. Available: \url{https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.resnet18.html}. Accessed: Nov. 9, 2026.
+\end{thebibliography}
+\end{document}

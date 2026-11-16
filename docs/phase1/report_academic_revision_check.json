@@ -1,0 +1,132 @@
+{
+  "date": "2026-11-09",
+  "source": "MLPTA.tex",
+  "static_pass": true,
+  "issues": [],
+  "sections": [
+    "引言",
+    "相关研究与需求分析",
+    "数据集与质量保障",
+    "冻结主干模型与实验方法",
+    "验证结果与误差分析",
+    "工艺辅助分析方案",
+    "讨论",
+    "结论与展望"
+  ],
+  "citation_count": 10,
+  "figures": [
+    "neu_cls_six_examples.png",
+    "c0_seed42_20261109_curves.png",
+    "c0_val_confusion_matrix.png",
+    "c0_val_errors.png",
+    "proposed_system_architecture.png"
+  ],
+  "validation_prediction_rows": 270,
+  "latex_compilation": "not available locally: xelatex, latexmk, tectonic not found",
+  "validation": {
+    "n": 270,
+    "accuracy": 0.9925925925925926,
+    "macro_f1": 0.9925921352887644,
+    "confusion_matrix": [
+      [
+        45,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        44,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        45,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        45,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        45,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        44
+      ]
+    ],
+    "per_class": {
+      "Cr": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 45
+      },
+      "In": {
+        "precision": 0.9777777777777777,
+        "recall": 0.9777777777777777,
+        "f1": 0.9777777777777777,
+        "support": 45
+      },
+      "Pa": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 45
+      },
+      "PS": {
+        "precision": 0.9782608695652174,
+        "recall": 1.0,
+        "f1": 0.989010989010989,
+        "support": 45
+      },
+      "RS": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 45
+      },
+      "Sc": {
+        "precision": 1.0,
+        "recall": 0.9777777777777777,
+        "f1": 0.9887640449438202,
+        "support": 45
+      }
+    },
+    "errors": [
+      {
+        "image_path": "raw/NEU-CLS/In_240.bmp",
+        "true": "In",
+        "pred": "PS"
+      },
+      {
+        "image_path": "raw/NEU-CLS/Sc_141.bmp",
+        "true": "Sc",
+        "pred": "In"
+      }
+    ]
+  },
+  "brace_balance": true
+}

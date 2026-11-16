@@ -1,0 +1,56 @@
+{
+  "generated_at_Asia_Shanghai": "2026-11-09T15:21:14.833843+08:00",
+  "seed": 42,
+  "requested_ratios": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "policy": "完全重复和所有 dHash 初筛近重复候选均分组，不删除图像；候选仍待人工复核",
+  "group_count": 1511,
+  "largest_group_size": 207,
+  "split_counts": {
+    "train": {
+      "total": 1260,
+      "by_class": {
+        "Cr": 210,
+        "In": 210,
+        "Pa": 210,
+        "PS": 210,
+        "RS": 210,
+        "Sc": 210
+      }
+    },
+    "val": {
+      "total": 270,
+      "by_class": {
+        "Cr": 45,
+        "In": 45,
+        "Pa": 45,
+        "PS": 45,
+        "RS": 45,
+        "Sc": 45
+      }
+    },
+    "test": {
+      "total": 270,
+      "by_class": {
+        "Cr": 45,
+        "In": 45,
+        "Pa": 45,
+        "PS": 45,
+        "RS": 45,
+        "Sc": 45
+      }
+    }
+  },
+  "actual_ratios": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "path_overlap_count": 0,
+  "exact_duplicate_group_leak_count": 0,
+  "near_candidate_cross_split_count": 0,
+  "test_set_usage": "仅用于未来最终评价，不参与调参"
+}

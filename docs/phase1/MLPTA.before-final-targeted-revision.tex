@@ -1,0 +1,236 @@
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}
+
+\IEEEoverridecommandlockouts
+\overrideIEEEmargins
+\usepackage{ctex}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{url}
+\graphicspath{{figures/}}
+
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead[CO,RE]{机器学习高级技术及应用}
+\fancyhead[LO,CE]{作者: 陈家浩等}
+\fancyhead[RO,LE]{\today}
+\fancyfoot[CO,RE]{机器学习高级技术及应用}
+\fancyfoot[LO,CE]{代课教师 李乡儒, 华南师范大学}
+\fancyfoot[RO,LE]{\thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\setlength{\voffset}{-10mm}
+\setlength{\topmargin}{0mm}
+\setlength{\headheight}{5mm}
+\setlength{\headsep}{5mm}
+\setlength{\footskip}{8mm}
+
+\title{\LARGE \bf
+基于 CNN 与迁移学习的钢材表面缺陷分类识别与辅助分析系统
+}
+\author{陈家浩~(学号 202421315022) \\
+组员二: \underline{\hspace{1.8cm}}~(学号待填写) \quad
+组员三: \underline{\hspace{1.8cm}}~(学号待填写) \\
+2026 年 11 月 9 日}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+钢材表面缺陷的类别信息可为质量复核提供线索, 但视觉分类本身无法判定缺陷的唯一形成原因. 本项目以热轧带钢的六种已知表面缺陷为对象, 拟建立“图像类别识别—文献知识关联—工艺核查建议”的辅助分析路径. 第一阶段聚焦前一环节: 对 NEU-CLS 的 1800 张图像完成质量核查与固定分层划分, 使用 ImageNet 预训练 ResNet18 构建仅训练六分类头的基线. 在 270 张验证图像上, 最佳权重取得 Accuracy 0.992593、Macro-F1 0.992592; 混淆矩阵显示 2 张误分类. 训练集与验证集之间未发现已记录的完全重复或 dHash 初筛候选交叉, 但这不能排除所有数据相关性. 工艺知识关联模块尚未实现, 数据集中也没有足以验证根因的生产参数. 因此, 当前结果仅支持同源六类图像分类的初步可行性, 不构成独立测试或工艺诊断结论.
+
+\vspace{1ex}\noindent\textbf{关键词}: 钢材表面缺陷; 图像分类; 迁移学习; ResNet18; 工艺辅助分析
+\end{abstract}
+
+\begin{eabstract}
+A defect category can provide an entry point for quality review, but an image label alone cannot establish a unique manufacturing cause. This project studies six known surface-defect categories of hot-rolled steel strip and proposes a future workflow that connects image classification to literature-grounded process clues and follow-up checks. The first stage addresses the classification component. We audited 1,800 NEU-CLS images, fixed a stratified and duplicate-aware split, and trained an ImageNet-pretrained ResNet18 with only its six-class head unfrozen. The best checkpoint achieved 0.992593 validation accuracy and 0.992592 macro-F1 on 270 images; two images were misclassified. No recorded exact duplicate or dHash candidate pair crosses the split, although this does not eliminate every possible dependency. The process-knowledge component has not been implemented, and NEU-CLS lacks production parameters and verified root-cause labels. These results therefore support only preliminary, within-dataset classification feasibility, not independent test performance or causal diagnosis.
+
+\vspace{1ex}\noindent\textbf{Keywords}: steel surface defects; image classification; transfer learning; ResNet18; process-oriented decision support
+\end{eabstract}
+
+\section{引言}
+热轧带钢表面的裂纹状纹理、氧化铁皮压入、划痕及其他缺陷可能影响产品外观和后续加工. 表面状态同时可能与上游材料、加热、除鳞、轧制和冷却等不同环节有关; 同一外观未必对应同一形成机制\cite{li-review,tang-review,dey-scale}. 质量管理人员获得一张缺陷图像时, 既需要对可见类型作一致的描述, 也需要知道应查阅哪些工艺记录和专业资料. 人工观察依赖经验, 在重复筛查及相似纹理区分上存在一致性挑战\cite{li-review,wen-survey}. 但仅将图像分类自动化仍只给出类别标签, 并未把标签转化为可核查的工艺线索.
+
+机器视觉研究已从人工设计纹理特征发展到卷积网络与迁移学习. 相关综述总结了钢材表面检测、分类和定位的不同任务及其数据与部署限制\cite{wen-survey,tang-review}. Wu 与 Lv 在热轧带钢图像上比较了卷积网络与迁移学习方案, 说明预训练特征在有限样本场景中具有研究价值\cite{wu-transfer}. 然而, 识别论文主要评价视觉标签的预测表现; 一张图像缺少材料成分、设备状态和工艺参数, 因而无法据此独立确认根因. 关于氧化铁皮压入的研究需要结合显微结构和过程记录, 正体现出外观分类与工艺诊断之间的证据差距\cite{dey-scale}.
+
+本项目据此设置两个层次的目标. 第一层是对 NEU-CLS 的 Cr、In、Pa、PS、RS、Sc 六种已知缺陷建立可复现的分类模型, 使图像转化为结构化类别. 第二层是计划把类别与经核实的文献知识关联, 展示可能涉及的生产工序、候选机制和下一步核查方向, 并保留不确定性及来源. 这是一种辅助解释路径, 不是自动根因诊断或工艺参数优化. 钢铁冶炼只是钢材生产链的一个环节; 缺陷也可能与连铸、加热、热轧、冷却或后续加工有关\cite{tang-review,guo-inclusion,dey-scale}.
+
+围绕上述目标, 本文首先检验固定特征提取器的 ResNet18 能否在固定划分上区分六类缺陷, 并考察逐类错误及误差向下游知识关联传播的风险. 后续再比较部分微调与冻结主干的性能和训练成本, 以及文献知识能否以可追溯、可审阅的方式为使用者提供线索. 第一阶段的贡献限于真实数据工程、冻结主干模型的初步验证与方案设计; 未提出新网络结构, 也未交付工艺分析系统.
+
+\section{相关研究与需求分析}
+\subsection{视觉识别与工艺解释的研究边界}
+带钢表面检测研究涵盖人工检查、传统视觉特征和深度学习方法. 李跃等的综述讨论了人工及多种无损检测方式的适用性, Wen 等总结了纹理特征方法与监督、弱监督深度模型; 这些工作表明, 视觉算法可改进缺陷表征, 但成像条件、类别相似性和数据标注仍影响评价\cite{li-review,wen-survey}. 东北大学 NEU 数据库也指出, Cr、RS、PS 的外观可能相近, 同类样本又会因照明与材料差异而变化\cite{neu-database}. 因而单一总体 Accuracy 不足以描述所有类别的错误.
+
+迁移学习为小规模数据集提供预训练表征. 残差网络通过残差连接缓解深层网络优化问题\cite{resnet}; 现有热轧带钢迁移学习实验提供了可比较的研究背景, 但各研究的数据划分与训练预算并不相同, 不能把其指标直接作为本项目的公平基线\cite{wu-transfer}. 本文选用冻结主干的 ResNet18 作为低训练成本的起点, 后续才考察解冻部分层的效果.
+
+缺陷类型与工艺因素的关系属于另一类证据问题. 对氧化铁皮压入, Dey 等分析了氧化层、除鳞与轧制条件; 对非金属夹杂, Guo 等结合铸坯的金相与成分手段调查来源\cite{dey-scale,guo-inclusion}. 这些研究依赖图像之外的材料与过程信息. 本项目可借其建立候选核查路径, 不能把文献中的机制自动归给某一张 NEU-CLS 图像.
+
+\subsection{使用场景与可验证目标}
+目标使用场景是质量管理人员已经取得一张含缺陷的钢材表面图像, 希望知道其可能所属的六类之一, 并进一步查阅该类型在专业资料中关联的工艺环节. 计划输出分三层: 其一为类别与六类模型输出; 其二为文献支持的可能工序及形成机制; 其三为资料出处、适用条件、反例与建议核查的记录. 结构化知识表可以记录“类别—工序—机制—证据—不确定性—核查建议”, 由人工逐条审核, 无需先引入数据库或生成式模型.
+
+分类与辅助分析需分别验收. 分类使用 Accuracy、Macro-F1、逐类 Precision/Recall/F1 和混淆矩阵; 工艺线索则检查文献可追溯性、表述准确性、覆盖范围及是否清楚标注假设. NEU-CLS 只提供图像类别, 没有可用于证明工艺根因的设备日志或过程参数\cite{neu-database}. 因而本阶段不能计算“工艺诊断准确率”. 本系统也不承担正常/异常判定、从整幅生产线图像定位缺陷、分割或实时部署任务.
+
+
+\section{数据集与质量保障}
+\subsection{六类缺陷及其可观察形态}
+NEU-CLS 由东北大学公开, 包含 Cr（Crazing）、In（Inclusion）、Pa（Patches）、PS（Pitted Surface）、RS（Rolled-in Scale）和 Sc（Scratches）六类热轧带钢表面图像\cite{neu-database}. 表\ref{tab:defects}概述类别名称、视觉线索及文献中讨论的工艺背景. 视觉描述是对该类图像的概括, 不是判定单张样本成因的规则; 同一类的纹理和对比度会变化, 不同类也可能相似\cite{neu-database,wen-survey}. 例如线状的 In 和 Sc 容易在局部纹理上相近, 而 Cr、RS 与 PS 也可能产生难区分的暗亮斑纹. 图\ref{fig:examples}给出每类一张未经增强的训练集原图.
+
+\begin{table*}[t]
+\centering\small
+\caption{NEU-CLS 六类缺陷的视觉概貌与文献中的候选工艺关联; 关联并非单张图像的根因结论}
+\label{tab:defects}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{p{0.65cm}p{3.0cm}p{4.7cm}p{8.2cm}}
+\toprule
+代码 & 英文名称与中文名称 & 常见视觉线索 & 文献涉及的工艺背景与必要核查 \\
+\midrule
+Cr & Crazing（龟裂） & 网状或分叉的细裂纹状纹理 & 热加工表层裂纹可与加热及轧制条件有关; 应结合材料与过程记录核查, 不能由纹理直接锁定机制\cite{guo-light,li-review}.\\
+In & Inclusion（夹杂） & 局部不规则暗斑或细长异物状痕迹 & 夹杂或压入异物可能涉及冶炼、连铸或轧制; 应结合显微及成分证据区分来源\cite{guo-inclusion,guo-light}.\\
+Pa & Patches（斑块） & 较大面积、边界不规则的斑片 & 文献讨论轧制中表面碎屑压入等候选机制; 需进一步检查物料表面与设备记录\cite{guo-light}.\\
+PS & Pitted Surface（麻点表面） & 密集点蚀状暗点或小凹坑纹理 & 文献将其与冷却等环节的条件联系; 需核查相应过程记录, 不能以图像反推确定参数\cite{guo-light}.\\
+RS & Rolled-in Scale（氧化铁皮压入） & 不规则片状深色区域及粗糙纹理 & 氧化层形成、除鳞不充分和随后的轧制是已有研究分析的机制; 核查需结合氧化层和工艺条件\cite{dey-scale}.\\
+Sc & Scratches（划痕） & 连续或断续的细长线状痕迹 & 与生产线表面接触、突出物等因素可能有关; 应检查相关接触路径和设备状态\cite{guo-light}.\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.8\textwidth]{neu_cls_six_examples.png}
+\caption{六类缺陷各一张训练集原图. 拼图仅并排展示, 不施加会改变纹理判断的图像增强.}
+\label{fig:examples}
+\end{figure*}
+
+\subsection{样本核查与固定划分}
+本研究使用 NEU-CLS 分类版, 共 1800 张 200$\times$200 的灰度 BMP 图像, 每类 300 张; 核查未发现无法读取的图像. 原始图像只包含缺陷类别, 没有正常类、定位框、生产参数或经过验证的根因标签\cite{neu-database}. 为避免同一图像重复出现在训练和评价数据中, 划分前执行 SHA256 完全重复检查, 并用 dHash 对视觉近似样本作初筛. 发现的一对完全重复图像位于训练集. dHash 阈值内共有 4418 对\emph{候选}, 其中人工重点复核的两对被确认近重复, 分别位于验证集内部和测试集内部. 已记录的完全重复与初筛候选均未跨集合, 但初筛不是“所有相关图像”的证明, 也不能把全部候选等同于真实重复.
+
+近重复关系具有连通传递性: 若将每条候选边都按重复关系强制合并, 最大连通组达到 207 张. 这会显著改变可分配的组大小与类别比例, 且其中可能包含大量只是纹理相似的不同图像. 因此没有仅凭初筛结果删除样本或强制把所有候选合并. 当前划分经过人工确认的高优先级样本跨集合检查, 仍保留未穷尽复核和同源采集相关性的风险.
+
+固定随机种子为 42, 按类别分层得到训练、验证和保留测试集, 规模见表\ref{tab:split}. 验证集用于选择模型和分析错误, 测试集留待后续独立评价, 本文不报告其预测结果.
+
+\begin{table}[t]
+\centering
+\caption{固定分层划分的样本数}
+\label{tab:split}
+\begin{tabular}{lrrrr}
+\toprule
+集合 & 每类 & 类别数 & 总数 & 比例 \\
+\midrule
+训练 & 210 & 6 & 1260 & 70\% \\
+验证 & 45 & 6 & 270 & 15\% \\
+测试 & 45 & 6 & 270 & 15\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{冻结主干模型与实验方法}
+\subsection{模型与预处理}
+考虑到每类仅有 210 张训练图像, 本阶段选择 ImageNet 预训练 ResNet18 的特征提取能力作为六分类起点\cite{resnet,pytorch-transfer}. 输入灰度图复制为三通道, 缩放至 224$\times$224, 并按相应预训练权重的均值和标准差归一化. 训练阶段仅作概率 0.5 的水平翻转; 验证与测试不使用随机增强. 水平翻转有助于减少对固定方向的依赖, 但其是否有利于所有缺陷形态, 仍需后续消融检查.
+
+冻结网络主干全部权重, 将末层替换为 $512\rightarrow6$ 的全连接层, 仅其 3078 个参数参与更新. BatchNorm 的运行均值与方差同样保持固定, 避免冻结权重时隐含更新特征分布. 模型共有 11\,179\,590 个参数. 这一方案降低小数据集上的训练成本, 也为后续部分解冻的 C1 实验提供对照, 不能据此断言它优于其他骨干网络.
+
+\subsection{训练与评价}
+使用交叉熵损失、Adam 优化器, 学习率 $10^{-3}$, 批量大小 32, 最多训练 15 轮. 固定随机种子 42, 根据验证集 Macro-F1 保存最佳权重, 连续 5 轮没有提高则提前停止. 实际执行 13 轮, 训练循环耗时 73.454\,s. 训练前以一个真实批次检验前向、反向传播、仅分类头更新、主干与 BatchNorm 统计量保持固定以及权重重新加载.
+
+对于六类均衡的验证集, 除总体准确率外, 逐类计算 Precision、Recall 和 F1, 并取六类 F1 的算术平均作为 Macro-F1. 这一指标能暴露类别间的表现差异, 同时与预设的模型选择准则一致. 下文所有结果均来自验证集; 测试集未参与模型选择或本阶段结果报告.
+
+
+
+\section{验证结果与误差分析}
+\subsection{收敛过程与模型选择}
+图\ref{fig:curves}显示训练损失由首轮 1.087 降至第 13 轮 0.039, 验证损失由 0.561 降至 0.045, 没有观察到验证损失反弹. 验证 Accuracy 在首轮已达到 0.9852, 随后在少数离散水平间变化. 这与预训练特征对该数据集可能已经具有较强可分性的解释相符, 但仅凭曲线不能断定快速收敛的原因, 还需与随机初始化及其他冻结策略比较.
+
+第 8 轮验证 Macro-F1 达到 0.992592, 对应 Accuracy 为 0.992593、验证损失为 0.0723. 第 9 至 13 轮的验证损失继续下降, Macro-F1 没有超过第 8 轮, 因此按\emph{预先设定的}指标保留第 8 轮权重, 并在第 13 轮触发早停. 在 270 张验证图像上, 一张样本的变化即可使 Accuracy 改变约 0.0037; 后续损失下降可能反映已有正确预测的置信度变化, 未必改变离散类别预测. 这解释了为何选择最佳轮次不能只看损失曲线.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.88\textwidth]{c0_seed42_20261109_curves.png}
+\caption{冻结主干 ResNet18 的真实训练与验证曲线. 最佳权重按验证 Macro-F1 选择.}
+\label{fig:curves}
+\end{figure*}
+
+\subsection{逐类表现与混淆}
+最佳权重在验证集上正确分类 268/270 张. 表\ref{tab:classmetrics}列出逐类指标; 图\ref{fig:confusion}给出计数混淆矩阵. Cr、Pa、RS 在各自 45 张验证图像上未出现错误; In、PS、Sc 的个别指标略低. 总体高准确率与 Macro-F1 接近, 反映当前六类样本数均衡且错误较少, 但每类 45 张的置信范围有限, 不能推出真实产线上各种成像条件下的表现.
+
+\begin{table}[t]
+\centering\small
+\caption{最佳权重在验证集上的逐类结果; 每类 45 张}
+\label{tab:classmetrics}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lrrr}
+\toprule
+类别 & Precision & Recall & F1 \\
+\midrule
+Cr & 1.0000 & 1.0000 & 1.0000 \\
+In & 0.9778 & 0.9778 & 0.9778 \\
+Pa & 1.0000 & 1.0000 & 1.0000 \\
+PS & 0.9783 & 1.0000 & 0.9890 \\
+RS & 1.0000 & 1.0000 & 1.0000 \\
+Sc & 1.0000 & 0.9778 & 0.9888 \\
+\midrule
+Macro & 0.9927 & 0.9926 & 0.9926 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{c0_val_confusion_matrix.png}
+\caption{最佳权重的验证集混淆矩阵; 行为真实类别, 列为预测类别, 单元格为样本数.}
+\label{fig:confusion}
+\end{figure}
+
+两张错误图像见图\ref{fig:errors}. 一张真实 In 被判为 PS, 图中可见较淡的窄线状痕迹; 另一张真实 Sc 被判为 In, 呈明亮长条及多个暗色细长痕迹. 后者提示 In 与 Sc 的局部线状特征可能发生混淆; 前者的具体判错原因尚无法仅凭图像与最终输出确定. 两张错误样本的预测类别 Softmax 输出分别约为 0.516 和 0.561, 说明模型并未在这两次预测中形成极端占优的输出. Softmax 值不是经过校准的正确概率, 不能直接解释为错误风险的可靠估计.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.8\textwidth]{c0_val_errors.png}
+\caption{验证集两张误分类原图. 左: 真实 In、预测 PS; 右: 真实 Sc、预测 In.}
+\label{fig:errors}
+\end{figure*}
+
+\subsection{结果的解释范围}
+固定划分内 268/270 的结果说明冻结预训练特征对当前六类图像具有较强的区分能力, 但验证集仍与训练集来自同一数据源, 而且被反复用于选择轮次. 已确认重复样本未跨集合降低了一类直接泄漏风险, 不能排除相同采集条件、相似纹理或未发现的近重复带来的相关性. 保留测试集尚未进行最终评价; 更没有跨工厂、跨设备或跨成像条件的外部验证. 因此不能把验证分数解释为工业部署的准确率.
+
+\section{工艺辅助分析方案}
+\subsection{从类别到可核查线索}
+本项目计划以模型输出的缺陷类别为索引, 连接一张人工审阅的结构化知识表. 每条记录包含缺陷名称、可能涉及的生产工序、文献报告的机制、适用条件、证据来源、可能的反例和建议核查的信息. 例如, 对 RS 可提示检查加热后的氧化层、除鳞及轧制记录, 同时注明这些只是文献中的候选路径\cite{dey-scale}; 对 In 则应区分铸坯内生夹杂与表面压入异物, 需要显微及成分证据才能继续判断\cite{guo-inclusion,guo-light}. 对其它类别也遵循同一证据标准, 不把类别标签机械转换成唯一成因.
+
+图\ref{fig:architecture}概括研究路线. 实线部分对应第一阶段的数据核查、模型训练与验证; 虚线部分是后续拟实现的预测接口与知识关联. Streamlit 可承载交互展示, 但它不是工艺知识的依据. 第二阶段将考虑 C1 部分微调、推理接口和知识表原型, 第三阶段再开展误差复核、知识内容评审与系统测试. 当前阶段尚无可运行的工艺知识模块, 因而也没有其评价结果.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.93\textwidth]{proposed_system_architecture.png}
+\caption{从视觉分类到工艺知识关联的总体方案. 实线框表示第一阶段已完成环节, 虚线框表示后续计划实现的环节.}
+\label{fig:architecture}
+\end{figure*}
+
+\subsection{错误传播与使用边界}
+若图像被误分为另一类别, 系统可能展示错误类别对应的工艺资料. 因此后续界面应并列呈现类别、模型输出分布、信息出处和“需人工复核”的提示, 尤其对输出接近或图像质量不足的情况保持谨慎. 是否设置拒识阈值须在独立数据上评估, 不能从本次两张误分类直接给出经验阈值. 工艺分析结果应明确为“待核查线索”, 不自动生成生产参数调整指令.
+
+\section{讨论}
+本研究的主要优势是数据、划分、训练配置和逐样本预测均有记录, 使总体指标可以回溯到具体错误. 但样本仅覆盖 NEU-CLS 的六个预定义缺陷类, 每类图像规模有限, 也没有正常类或真实生产线背景. 单一分层划分提供了清晰的课程实验基线, 却不能估计不同随机划分、采集批次或跨域条件下的性能波动. 尚未开展多种骨干模型、增强策略或冻结深度的公平比较.
+
+工艺关联的证据限制更强. 文献中的机制通常来自特定材料、设备和工况, 而 NEU-CLS 不提供可验证这些条件的元数据. 表\ref{tab:defects}中的联系只能作为候选线索, 不能作为对数据集图像的根因标注. 未来知识表需逐条记录引用出处、适用条件和证据等级, 并由具有工艺背景的人员审核. 若缺少这些步骤, 即使视觉分类准确, 下游解释仍可能产生误导.
+
+\section{结论与展望}
+本文把钢材表面缺陷识别定位为工艺问题辅助分析的入口. 第一阶段以 NEU-CLS 的 1800 张六类图像完成数据质量核查与固定划分, 建立冻结主干的 ImageNet 预训练 ResNet18 基线. 最佳模型在 270 张验证图像上达到 Accuracy 0.992593、Macro-F1 0.992592, 两张误分类揭示了类别间局部纹理混淆及下游知识关联的错误传播风险. 该结果支持同源数据上六分类的初步可行性, 尚不能证明独立测试表现或工艺诊断能力.
+
+后续将比较 C1 部分微调与当前基线, 使用保留测试集作一次最终分类评价, 并构建可追溯的文献知识表与交互原型. 完整项目的价值取决于分类的稳健性、工艺资料的准确性以及输出不确定性的清楚表达; 这些都需要独立验证, 不能由当前验证集高分替代.
+
+
+\begin{thebibliography}{99}
+\bibitem{li-review} 李跃, 王子铭, 李鑫林, 岳强, “带钢表面缺陷检测方法研究进展,” \emph{钢铁研究学报}, vol.~35, no.~8, pp.~950--962, 2023. doi: 10.13228/j.boyuan.issn1001-0963.20220363.
+\bibitem{tang-review} B. Tang, C. Li, W. Sun, and Z.-K. Lin, “Review of surface defect detection of steel products based on machine vision,” \emph{IET Image Processing}, vol.~17, no.~2, pp.~303--322, 2023. doi: 10.1049/ipr2.12647.
+\bibitem{wen-survey} X. Wen, J. Shan, Y. He, and K. Song, “Steel surface defect recognition: A survey,” \emph{Coatings}, vol.~13, no.~1, art.~17, 2023. doi: 10.3390/coatings13010017.
+\bibitem{neu-database} K. Song, “NEU surface defect database,” Northeastern University. [Online]. Available: \url{https://faculty.neu.edu.cn/songkechen/zh_CN/zhym/263269/}. Accessed: Nov.~9, 2026.
+\bibitem{wu-transfer} H. Wu and Q. Lv, “Hot-rolled steel strip surface inspection based on transfer learning model,” \emph{Journal of Sensors}, vol.~2021, art.~6637252, 2021. doi: 10.1155/2021/6637252.
+\bibitem{resnet} K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” in \emph{Proc. IEEE Conf. Computer Vision and Pattern Recognition}, 2016, pp.~770--778. doi: 10.1109/CVPR.2016.90.
+\bibitem{dey-scale} A. Dey, T. Bhattacharyya, and S. Dhara, “Characterization of hot rolled scales-root cause identification and remedial action,” \emph{Engineering Failure Analysis}, vol.~34, pp.~478--487, 2013. doi: 10.1016/j.engfailanal.2013.07.018.
+\bibitem{guo-inclusion} J. Guo et al., “Determination of non-metallic inclusions in a continuous casting slab of ultra-low carbon interstitial free steel by applying of metallographic method, electrolytic method and RTO technique,” \emph{Scientific Reports}, vol.~9, art.~2929, 2019. doi: 10.1038/s41598-018-36766-6.
+\bibitem{guo-light} N. Guo, H. Fan, Q. Dong, R. Gu, and S. Xu, “A lightweight model for hot-rolled steel strip surface defect recognition,” \emph{Sensors}, vol.~26, no.~5, art.~1618, 2026. doi: 10.3390/s26051618.
+\bibitem{pytorch-transfer} TorchVision, “ResNet18 model and pretrained weight transforms,” PyTorch documentation. [Online]. Available: \url{https://docs.pytorch.org/vision/stable/models/generated/torchvision.models.resnet18.html}. Accessed: Nov.~9, 2026.
+\end{thebibliography}
+
+
+\end{document}

@@ -1,0 +1,120 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+.ipynb_checkpoints/
+
+# =========================
+# Virtual environments
+# =========================
+.venv/
+venv/
+env/
+ENV/
+
+# =========================
+# Local caches
+# =========================
+.cache/
+pip-wheel-metadata/
+
+# =========================
+# Local configuration / secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets*.yaml
+secrets*.yml
+
+# =========================
+# IDE / editor
+# 保留可供团队共用的 VS Code 配置。
+# =========================
+.idea/
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+*.swp
+*.swo
+*~
+*.tmp
+*.bak
+
+# =========================
+# Operating-system files
+# =========================
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# =========================
+# Datasets
+# 提交 NEU-CLS 原始压缩包、解压图像和固定划分清单。
+# =========================
+data/interim/
+data/processed/
+data/raw/*.part
+
+# =========================
+# Model weights / exported models
+# 默认忽略所有权重，仅提交已确认的 C0 最佳模型。
+# =========================
+checkpoints/*
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+
+!checkpoints/c0_seed42_20261109_best.pt
+
+# =========================
+# Experiment tracking directories
+# =========================
+runs/
+wandb/
+mlruns/
+lightning_logs/
+tensorboard/
+
+# =========================
+# Reports
+# Overleaf 报告由项目负责人单独发送。
+# =========================
+report_overleaf/
+
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.xdv

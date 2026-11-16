@@ -1,0 +1,12 @@
+experiment_id: c0_seed42_20261109
+seed: 42
+batch_size: 32
+epochs: 15
+learning_rate: 0.001
+optimizer: Adam
+loss: CrossEntropyLoss
+early_stopping_patience: 5
+model_selection: val_macro_f1
+device: cuda
+num_workers: 0
+pretrained_weights: IMAGENET1K_V1

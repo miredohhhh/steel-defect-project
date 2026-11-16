@@ -1,0 +1,23 @@
+{
+  "experiment_id": "c0_seed42_20261109",
+  "status": "complete",
+  "epochs_completed": 13,
+  "early_stopped": true,
+  "best_epoch": 8,
+  "best_val_metrics": {
+    "loss": 0.07232238054275512,
+    "accuracy": 0.9925925731658936,
+    "macro_f1": 0.9925921352887644
+  },
+  "training_total_seconds": 73.454228699964,
+  "checkpoint_reload_consistent": true,
+  "reload_max_abs_logit_difference": 0.0,
+  "reloaded_val_metrics": {
+    "loss": 0.07232238054275512,
+    "accuracy": 0.9925925731658936,
+    "macro_f1": 0.9925921352887644
+  },
+  "checkpoint": "checkpoints/c0_seed42_20261109_best.pt",
+  "history": "results/metrics/c0_seed42_20261109_history.csv",
+  "curves": "results/figures/c0_seed42_20261109_curves.png"
+}

@@ -1,0 +1,11 @@
+{
+  "dataset": "NEU-CLS",
+  "source_page": "https://faculty.neu.edu.cn/songkechen/zh_CN/zhym/263269/",
+  "official_page_google_drive_link": "https://drive.google.com/file/d/1NGlXT9sIaQpyxUoT6MLKm1Pr6x8oxOvc/view",
+  "downloaded_at_Asia_Shanghai": "2026-11-09T14:59:41.880452+08:00",
+  "archive_path": "data/raw/NEU-CLS.rar",
+  "archive_size_bytes": 50733617,
+  "archive_sha256": "a85bcc6bfa1a40e76f28079e135694aaf5f6a4ee01203f7eaacff0ebafaa96f8",
+  "archive_bmp_entries": 1800,
+  "license_status": "官方页面未给出明确许可证或使用条款；只列出引用建议，需进一步确认"
+}

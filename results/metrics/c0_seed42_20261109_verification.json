@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "epochs": 13,
+  "best_epoch": 8,
+  "checkpoint_loaded": true,
+  "split_hashes_unchanged": true,
+  "history_curve_log_consistent": true,
+  "validation_predictions": 270,
+  "recomputed_best_val_metrics": {
+    "loss": 0.07232238352298737,
+    "accuracy": 0.9925925731658936,
+    "macro_f1": 0.9925921352887644
+  },
+  "figure_valid": true
+}

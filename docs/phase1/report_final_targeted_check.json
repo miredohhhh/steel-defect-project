@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-09",
+  "static_pass": true,
+  "issues": [],
+  "source_sha256": "4371c7d515d92b2340af6bb4ccf84ac176360283517c5d08a4f50f2064cbbf4a",
+  "citations": 13,
+  "figures": [
+    "neu_cls_six_examples.png",
+    "c0_seed42_20261109_curves.png",
+    "c0_val_confusion_matrix.png",
+    "c0_val_errors.png",
+    "system_function_dataflow.png"
+  ],
+  "split_evidence": {
+    "near_candidates": 4418,
+    "connected_groups": 1511,
+    "largest_group": 207,
+    "largest_group_split": "train",
+    "candidate_cross_split": 0
+  },
+  "compile": {
+    "engine": "Tectonic 0.17.0",
+    "exit_code": 0,
+    "pdf_pages": 7,
+    "overfull_hbox": false,
+    "balance_warning": false,
+    "font_warnings": "font map/shape warnings in local Tectonic build; visual rendering checked"
+  },
+  "zip_entries": 7,
+  "zip_sha256": "e7fc7b307a3e468c7f57f2ea44fb15f831bde365344c53c316af5b2294c1492f"
+}

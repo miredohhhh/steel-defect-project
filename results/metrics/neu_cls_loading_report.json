@@ -1,0 +1,49 @@
+{
+  "generated_at_Asia_Shanghai": "2026-11-09T15:17:26.631576+08:00",
+  "splits": {
+    "train": {
+      "dataset_size": 1260,
+      "batch_shape": [
+        32,
+        3,
+        224,
+        224
+      ],
+      "label_min_in_batch": 0,
+      "label_max_in_batch": 5,
+      "label_min_all": 0,
+      "label_max_all": 5,
+      "image_dtype": "torch.float32"
+    },
+    "val": {
+      "dataset_size": 270,
+      "batch_shape": [
+        32,
+        3,
+        224,
+        224
+      ],
+      "label_min_in_batch": 0,
+      "label_max_in_batch": 0,
+      "label_min_all": 0,
+      "label_max_all": 5,
+      "image_dtype": "torch.float32"
+    },
+    "test": {
+      "dataset_size": 270,
+      "batch_shape": [
+        32,
+        3,
+        224,
+        224
+      ],
+      "label_min_in_batch": 0,
+      "label_max_in_batch": 0,
+      "label_min_all": 0,
+      "label_max_all": 5,
+      "image_dtype": "torch.float32"
+    }
+  },
+  "validation_and_test_are_deterministic": true,
+  "augmentation_example": "results/figures/neu_cls_train_augmentation.png"
+}

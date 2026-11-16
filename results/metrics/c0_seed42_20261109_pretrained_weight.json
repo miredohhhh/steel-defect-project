@@ -1,0 +1,9 @@
+{
+  "source_url": "https://download.pytorch.org/models/resnet18-f37072fd.pth",
+  "torchvision_weights": "ResNet18_Weights.IMAGENET1K_V1",
+  "cached_path": ".cache/torch/hub/checkpoints/resnet18-f37072fd.pth",
+  "size_bytes": 46830571,
+  "sha256": "f37072fd47e89c5e827621c5baffa7500819f7896bbacec160b1a16c560e07ec",
+  "verified_prefix": "f37072fd",
+  "verified_at_Asia_Shanghai": "2026-11-09T16:25:44.451209+08:00"
+}

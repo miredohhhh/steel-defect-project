@@ -1,0 +1,3 @@
+﻿image_a,image_b,similarity_info,human_decision,notes
+raw/NEU-CLS/In_188.bmp,raw/NEU-CLS/In_210.bmp,dhash_distance=2; highpass_correlation=0.574693; review_priority=high,duplicate,两张图片的缺陷纹理、形状和分布基本一致，仅存在轻微亮度或位置差异，人工判断为近重复图像。
+raw/NEU-CLS/PS_171.bmp,raw/NEU-CLS/PS_292.bmp,dhash_distance=1; highpass_correlation=0.44952; review_priority=high,duplicate,两张图片的缺陷纹理、形状和分布基本一致，仅存在轻微亮度或位置差异，人工判断为近重复图像。

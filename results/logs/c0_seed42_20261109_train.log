@@ -1,0 +1,16 @@
+2026-11-09T16:27:43.738790+08:00 start experiment=c0_seed42_20261109 device=cuda train=1260 val=270
+2026-11-09T16:28:04.492975+08:00 epoch=1 train_loss=1.086774 train_accuracy=0.756349 val_loss=0.561193 val_accuracy=0.985185 val_macro_f1=0.985222 seconds=20.750 best=True
+2026-11-09T16:28:08.999175+08:00 epoch=2 train_loss=0.392696 train_accuracy=0.973810 val_loss=0.279583 val_accuracy=0.988889 val_macro_f1=0.988885 seconds=4.500 best=True
+2026-11-09T16:28:13.402191+08:00 epoch=3 train_loss=0.225573 train_accuracy=0.982540 val_loss=0.187649 val_accuracy=0.985185 val_macro_f1=0.985182 seconds=4.394 best=False
+2026-11-09T16:28:17.692298+08:00 epoch=4 train_loss=0.160204 train_accuracy=0.986508 val_loss=0.141361 val_accuracy=0.988889 val_macro_f1=0.988886 seconds=4.294 best=True
+2026-11-09T16:28:21.788304+08:00 epoch=5 train_loss=0.121080 train_accuracy=0.990476 val_loss=0.112711 val_accuracy=0.988889 val_macro_f1=0.988886 seconds=4.079 best=False
+2026-11-09T16:28:26.113624+08:00 epoch=6 train_loss=0.096887 train_accuracy=0.995238 val_loss=0.094692 val_accuracy=0.988889 val_macro_f1=0.988886 seconds=4.319 best=False
+2026-11-09T16:28:30.646655+08:00 epoch=7 train_loss=0.080854 train_accuracy=0.996032 val_loss=0.081776 val_accuracy=0.992593 val_macro_f1=0.992589 seconds=4.527 best=True
+2026-11-09T16:28:35.234108+08:00 epoch=8 train_loss=0.072557 train_accuracy=0.995238 val_loss=0.072322 val_accuracy=0.992593 val_macro_f1=0.992592 seconds=4.584 best=True
+2026-11-09T16:28:39.536757+08:00 epoch=9 train_loss=0.064441 train_accuracy=0.993651 val_loss=0.064331 val_accuracy=0.992593 val_macro_f1=0.992592 seconds=4.301 best=False
+2026-11-09T16:28:43.972770+08:00 epoch=10 train_loss=0.053061 train_accuracy=0.996825 val_loss=0.058064 val_accuracy=0.992593 val_macro_f1=0.992592 seconds=4.428 best=False
+2026-11-09T16:28:48.254815+08:00 epoch=11 train_loss=0.049373 train_accuracy=0.996825 val_loss=0.053169 val_accuracy=0.992593 val_macro_f1=0.992592 seconds=4.269 best=False
+2026-11-09T16:28:52.648735+08:00 epoch=12 train_loss=0.043076 train_accuracy=0.997619 val_loss=0.048684 val_accuracy=0.992593 val_macro_f1=0.992592 seconds=4.387 best=False
+2026-11-09T16:28:57.194343+08:00 epoch=13 train_loss=0.039484 train_accuracy=0.997619 val_loss=0.045327 val_accuracy=0.992593 val_macro_f1=0.992592 seconds=4.537 best=False
+2026-11-09T16:28:57.194343+08:00 early_stopping epoch=13 patience=5
+2026-11-09T16:28:58.396592+08:00 complete best_epoch=8 best_val_accuracy=0.992593 best_val_macro_f1=0.992592 total_seconds=73.454

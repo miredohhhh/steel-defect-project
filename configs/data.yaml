@@ -1,0 +1,19 @@
+dataset_name: NEU-CLS
+data_root: data
+images_root: data/raw/NEU-CLS
+seed: 42
+split:
+  train: 0.70
+  val: 0.15
+  test: 0.15
+quality:
+  perceptual_hash: dhash64
+  near_duplicate_max_hamming_distance: 4
+preprocessing:
+  image_size: 224
+  channels: 3
+  resnet18_weights: IMAGENET1K_V1
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+  train_horizontal_flip_probability: 0.5
+  val_test_random_augmentation: false
