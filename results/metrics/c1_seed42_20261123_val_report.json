@@ -1,0 +1,97 @@
+{
+  "split": "val",
+  "sample_count": 270,
+  "accuracy": 1.0,
+  "macro_precision": 1.0,
+  "macro_recall": 1.0,
+  "macro_f1": 1.0,
+  "per_class": {
+    "Cr": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 45.0
+    },
+    "In": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 45.0
+    },
+    "Pa": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 45.0
+    },
+    "PS": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 45.0
+    },
+    "RS": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 45.0
+    },
+    "Sc": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 45.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      45,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      45,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      45,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      45,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      45,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      45
+    ]
+  ],
+  "errors": []
+}

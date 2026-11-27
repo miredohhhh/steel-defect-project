@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "batch_shape": [
+    32,
+    3,
+    224,
+    224
+  ],
+  "loss": 0.047029025852680206,
+  "trainable_names": [
+    "network.layer4.0.conv1.weight",
+    "network.layer4.0.bn1.weight",
+    "network.layer4.0.bn1.bias",
+    "network.layer4.0.conv2.weight",
+    "network.layer4.0.bn2.weight",
+    "network.layer4.0.bn2.bias",
+    "network.layer4.0.downsample.0.weight",
+    "network.layer4.0.downsample.1.weight",
+    "network.layer4.0.downsample.1.bias",
+    "network.layer4.1.conv1.weight",
+    "network.layer4.1.bn1.weight",
+    "network.layer4.1.bn1.bias",
+    "network.layer4.1.conv2.weight",
+    "network.layer4.1.bn2.weight",
+    "network.layer4.1.bn2.bias",
+    "network.fc.weight",
+    "network.fc.bias"
+  ],
+  "updated_names": [
+    "network.layer4.0.conv1.weight",
+    "network.layer4.0.bn1.weight",
+    "network.layer4.0.bn1.bias",
+    "network.layer4.0.conv2.weight",
+    "network.layer4.0.bn2.weight",
+    "network.layer4.0.bn2.bias",
+    "network.layer4.0.downsample.0.weight",
+    "network.layer4.0.downsample.1.weight",
+    "network.layer4.0.downsample.1.bias",
+    "network.layer4.1.conv1.weight",
+    "network.layer4.1.bn1.weight",
+    "network.layer4.1.bn1.bias",
+    "network.layer4.1.conv2.weight",
+    "network.layer4.1.bn2.weight",
+    "network.layer4.1.bn2.bias",
+    "network.fc.weight",
+    "network.fc.bias"
+  ],
+  "reload_max_abs_difference": 0.0
+}

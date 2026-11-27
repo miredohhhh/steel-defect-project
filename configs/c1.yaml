@@ -1,0 +1,13 @@
+experiment_id: c1_seed42_20261123
+seed: 42
+batch_size: 32
+epochs: 15
+learning_rate: 0.0001
+optimizer: Adam
+loss: CrossEntropyLoss
+early_stopping_patience: 5
+model_selection: val_macro_f1
+batchnorm_running_stats: frozen
+device: auto
+num_workers: 0
+initial_checkpoint: checkpoints/c0_seed42_20261109_best.pt

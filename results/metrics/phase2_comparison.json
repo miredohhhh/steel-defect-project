@@ -1,0 +1,32 @@
+{
+  "models": [
+    {
+      "experiment_id": "c0_seed42_20261109",
+      "split": "val",
+      "accuracy": 0.9925925925925926,
+      "macro_f1": 0.9925921352887644,
+      "best_epoch": 8,
+      "epochs": 13,
+      "train_seconds": 73.454228699964,
+      "trainable_parameters": 3078,
+      "device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "errors": 2
+    },
+    {
+      "experiment_id": "c1_seed42_20261123",
+      "split": "val",
+      "accuracy": 1.0,
+      "macro_f1": 1.0,
+      "best_epoch": 1,
+      "epochs": 6,
+      "train_seconds": 96.97569259999727,
+      "trainable_parameters": 8396806,
+      "device": "cpu",
+      "errors": 0
+    }
+  ],
+  "selected_model": "c1_seed42_20261123",
+  "selection_rule": "验证 Macro-F1 优先，持平选 C0",
+  "cost_note": "C1 从 C0 继续训练，增加了训练预算。本轮 C1 与历史 C0 的设备环境不同，耗时仅作记录，不能作同硬件速度对照。",
+  "test_evaluated": false
+}
