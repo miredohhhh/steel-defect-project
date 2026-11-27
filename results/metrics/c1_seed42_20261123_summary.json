@@ -1,0 +1,17 @@
+{
+  "experiment_id": "c1_seed42_20261123",
+  "status": "complete",
+  "best_epoch": 1,
+  "epochs_completed": 6,
+  "best_val_metrics": {
+    "loss": 0.004258451480914287,
+    "accuracy": 1.0,
+    "macro_f1": 1.0
+  },
+  "training_total_seconds": 96.97569259999727,
+  "device": "cpu",
+  "checkpoint_reload_consistent": true,
+  "reload_max_abs_logit_difference": 0.0,
+  "checkpoint": "checkpoints/c1_seed42_20261123_best.pt",
+  "test_evaluated": false
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "coverage": {
+    "Cr": "仅有条件性或弱关联知识",
+    "In": "仅有条件性或弱关联知识",
+    "Pa": "暂无可靠证据",
+    "PS": "仅有条件性或弱关联知识",
+    "RS": "候选资料已定位，待成员审核",
+    "Sc": "候选资料已定位，待成员审核"
+  },
+  "records": [
+    {
+      "source_url": "https://www.aist.org/AIST/aist/AIST/Conferences_Exhibitions/Training_Seminars/Training%20Presentations/10-Hot-Rolling-Processes-msts-20.pdf",
+      "source_title": "AIST · Principles of Hot Rolling（2020）",
+      "evidence_type": "专业工艺培训资料",
+      "entered_by": "AI 辅助录入，待团队署名确认",
+      "reviewer": null,
+      "review_date": null,
+      "review_status": "pending",
+      "source_status": "verified",
+      "source_checked_at": "2026-11-23",
+      "limitations": "适用范围须由材料或工艺人员核对。NEU-CLS 图像没有现场工况和根因标签，类别匹配仅提供候选核查线索。",
+      "id": "RS-AIST-057",
+      "class_code": "RS",
+      "process": "热轧除鳞与精轧",
+      "mechanism": "资料讨论除鳞喷嘴堵塞或损伤时，再生氧化铁皮可能在后续轧制中压入表面。",
+      "checks": [
+        "除鳞喷嘴检查记录",
+        "粗轧出口和精轧入口的除鳞记录",
+        "材料表面氧化层观察"
+      ],
+      "conditions": "热轧带钢，已通过现场或材料核查确认存在氧化铁皮压入，并具备相应除鳞工序记录。",
+      "evidence_location": "PDF 第 29 页，上半页幻灯片 57，ROLLED-IN SCALE，IMPROPER DESCALING 条目"
+    },
+    {
+      "source_url": "https://www.aist.org/AIST/aist/AIST/Conferences_Exhibitions/Training_Seminars/Training%20Presentations/10-Hot-Rolling-Processes-msts-20.pdf",
+      "source_title": "AIST · Principles of Hot Rolling（2020）",
+      "evidence_type": "专业工艺培训资料",
+      "entered_by": "AI 辅助录入，待团队署名确认",
+      "reviewer": null,
+      "review_date": null,
+      "review_status": "pending",
+      "source_status": "verified",
+      "source_checked_at": "2026-11-23",
+      "limitations": "适用范围须由材料或工艺人员核对。NEU-CLS 图像没有现场工况和根因标签，类别匹配仅提供候选核查线索。",
+      "id": "Sc-AIST-065",
+      "class_code": "Sc",
+      "process": "热轧输送与轧制接触路径",
+      "mechanism": "资料将高温划痕与侵入轧制通道的接触物联系，提示通过位置和接触路径记录核查。",
+      "checks": [
+        "带钢接触路径",
+        "轧机周边异常接触记录",
+        "划痕形貌与氧化状态观察"
+      ],
+      "conditions": "热轧带钢，具备现场划痕观察及接触路径信息，可区分轧机附近与轧后工序。",
+      "evidence_location": "PDF 第 33 页，上半页幻灯片 65，SCRATCH DEFECTS，HIGH TEMPERATURE SCRATCHES 条目"
+    }
+  ]
+}

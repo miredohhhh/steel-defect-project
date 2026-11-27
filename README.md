@@ -1,8 +1,46 @@
 # 钢材表面缺陷分类识别与辅助分析系统
 
-基于 CNN 与迁移学习的钢材表面六类缺陷分类项目。第一阶段的数据工程和 ResNet18 C0 训练已完成。仓库包含 NEU-CLS 原始数据、固定划分和 C0 最佳权重；克隆后无需重新下载数据或训练 C0。单图推理接口、Streamlit 网页、C1 微调以及“用户确认类别后按确认类别查询已审核工艺知识”属于第二、第三阶段待完成工作。初次接手请先读 [第二阶段交接说明](docs/HANDOVER.md)。
+基于 CNN 与迁移学习的钢材表面六类缺陷分类项目。第一阶段数据工程和 C0 已完成，第二阶段已实现单图推理、Streamlit 上传与类别确认、本地工艺知识查询，并完成 C1 微调和验证集比较。两条工艺候选资料等待独立成员复核，正式展示的已审核条目数为 0。
 
-“基于确认缺陷类别的工艺核查建议”已于 2026-11-16 正式纳入[需求基线 V0.3](docs/requirements/钢材表面缺陷分类项目_需求说明与验收标准_V0.3.md)和[三阶段计划 V1.1](docs/plans/钢材表面缺陷分类项目_三阶段实施与报告提交计划_V1.1.md)。该功能当前尚未实现：现有 C0 只能完成六类预测，直接加载或运行 C0 不代表已经具备人工确认、知识查询或工艺建议功能。
+当前依据为[需求 V0.3](docs/requirements/钢材表面缺陷分类项目_需求说明与验收标准_V0.3.md)和[三阶段计划 V1.1](docs/plans/钢材表面缺陷分类项目_三阶段实施与报告提交计划_V1.1.md)。第二阶段成果见[报告](docs/phase2/report.md)、[验证记录](docs/phase2/validation.md)、[工艺复核材料](docs/phase2/knowledge_review.md)和[执行计划](docs/plans/第二阶段执行计划_2026-11-23.md)。
+
+## 第二阶段本地启动
+
+在项目根目录运行。当前本机已建立 .venv，使用 Python 3.13.7 和 CPU 版 PyTorch，pip check 通过。原第一阶段 CUDA 环境说明保留在后文。
+
+~~~powershell
+& .\.venv\Scripts\python.exe -m streamlit run app.py --server.address 127.0.0.1
+~~~
+
+浏览器打开 http://127.0.0.1:8501 。上传 JPEG/PNG（最大 10 MB），查看原图和六类 Softmax 分数，确认或修正类别。知识条目完成真实独立审核后才展示，用户还须核对适用条件。页面默认加载比较结果选出的 C1，缺失权重时提供错误提示。
+
+首次在另一台电脑安装，可以使用下面的 CPU 环境步骤。清单来自本机实际版本，干净安装与跨成员复现待验证。
+
+~~~powershell
+py -3.13 -m venv .venv
+& .\.venv\Scripts\python.exe -m pip install -r requirements-phase2.txt
+& .\.venv\Scripts\python.exe -m pip check
+~~~
+
+命令行预测与验证如下。仓库已包含 C0 权重，本地新增 C1 权重仍按既有 .gitignore 忽略，传给其他成员时需单独交付。若只有 C0，可显式指定它启动页面。
+
+~~~powershell
+& .\.venv\Scripts\python.exe scripts\predict.py data\raw\NEU-CLS\Cr_1.bmp
+& .\.venv\Scripts\python.exe -m pytest -q
+$env:STEEL_CHECKPOINT = 'checkpoints/c0_seed42_20261109_best.pt'
+& .\.venv\Scripts\python.exe -m streamlit run app.py --server.address 127.0.0.1
+~~~
+
+未设置 STEEL_CHECKPOINT 时，按 results/metrics/phase2_comparison.json 选择模型。清除覆盖设置可执行 Remove-Item Env:STEEL_CHECKPOINT -ErrorAction SilentlyContinue。
+
+C1 已完成的实验编号为 c1_seed42_20261123。重新训练前先在 configs/c1.yaml 使用新实验编号，脚本拒绝覆盖已有产物。汇总脚本当前汇总本轮固定的 C0/C1 两个实验，新实验需明确调整汇总入口。
+
+~~~powershell
+& .\.venv\Scripts\python.exe scripts\train_c1.py --config configs\c1.yaml
+& .\.venv\Scripts\python.exe scripts\build_phase2_report.py
+~~~
+
+以上训练命令用于新实验。现有演示直接加载已有权重。
 
 ## 环境
 
@@ -23,7 +61,7 @@ $env:TORCH_HOME = (Join-Path (Get-Location) '.cache\torch')
 
 创建前先确认使用 Python 3.11；如 `py -3.11` 能识别 Python，也可执行 `py -3.11 -m venv .venv`。依赖清单固定了 Windows CUDA 13.0 构建，原环境使用 NVIDIA GPU；其他设备需要按实际驱动选择兼容的 PyTorch 安装方式。现有 `verify_environment.py` 要求 CUDA 可用，CPU 环境无法通过其中的 GPU 检查。可参考 [PyTorch 官方安装页](https://pytorch.org/get-started/locally/)及[版本命令](https://pytorch.org/get-started/previous-versions/)。
 
-现阶段可直接加载 `checkpoints/c0_seed42_20261109_best.pt` 对单图分类。完整的 PowerShell 预测示例在[交接说明第 5 节](docs/HANDOVER.md#5-克隆后怎么启动和使用现有项目)。仓库目前没有 `app.py` 或 `predict.py`，因此暂时没有可启动的 Streamlit 页面。最佳权重可用 `Get-FileHash checkpoints\c0_seed42_20261109_best.pt -Algorithm SHA256` 校验，预期 SHA256 为 `3BBA7E881F2C523A192F4BC5CEA4A91A981071E5C7E2702C4CAC4A2DEDCCCDA5`。
+C0 权重可直接用于 scripts/predict.py，网页入口为 app.py。第一阶段手动加载示例保留在交接说明第 5 节。最佳 C0 权重 SHA256 为 3BBA7E881F2C523A192F4BC5CEA4A91A981071E5C7E2702C4CAC4A2DEDCCCDA5。
 
 ## 目录
 
@@ -83,8 +121,8 @@ C0 冻结预训练 ResNet18 主干及其 BatchNorm 运行统计量，仅训练�
 
 最佳权重：`checkpoints/c0_seed42_20261109_best.pt`；逐轮指标：`results/metrics/c0_seed42_20261109_history.csv`；曲线：`results/figures/c0_seed42_20261109_curves.png`；训练日志：`results/logs/c0_seed42_20261109_train.log`。运行元数据记录实际依赖版本、类别映射、预处理、随机种子和划分 SHA256。C0 只使用 train 与 val；test 留待最终评价。
 
-## 后续功能：基于确认类别的工艺核查建议
+## 基于确认类别的工艺核查建议
 
 正式流程为：上传单张缺陷图片 → 六分类推理并展示原始预测和六类输出 → 用户确认或修正类别 → 按最终确认类别精确查询结构化知识 → 展示审核通过的候选工序、候选机制、核查事项、来源与适用条件。用户确认前不展示具体工艺机制；修改类别后查询结果必须同步更新。
 
-该模块是 F1 后续交付内容，不阻塞现有 C0 与单图分类 M0。它仅提供可追溯的核查线索，不进行根因诊断、生产参数调整、批次分析，也不使用数据库、知识图谱、大模型或 RAG。截至 2026-11-16，人工确认交互、知识表、查询和展示均尚未实现。
+第二阶段已实现人工确认、知识表、精确查询和展示门控。当前候选条目需独立成员复核后正式展示，详见第二阶段报告和知识复核材料。

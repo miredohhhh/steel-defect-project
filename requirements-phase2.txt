@@ -1,0 +1,15 @@
+# Windows CPU / Python 3.13; verified 2026-11-23
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+torch==2.12.0+cpu
+torchvision==0.27.0+cpu
+numpy==2.3.5
+pandas==2.3.3
+Pillow==12.0.0
+scikit-learn==1.9.1
+matplotlib==3.10.8
+PyYAML==6.0.3
+tqdm==4.70.1
+pytest==9.2.0
+streamlit==1.67.0
+tzdata==2025.3
